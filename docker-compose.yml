@@ -1,0 +1,10 @@
+services:
+  backup_to_s3:
+    build: 
+      context: .
+      dockerfile: .Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./backupPoint:/app/backupPoint
+      
