@@ -1,10 +1,13 @@
-FROM python:3.7.13-alpine3.16
+FROM python:3.7.13-alpine3.16 AS install
 
 WORKDIR /app
 
-COPY ./src .
 RUN mkdir backupPoint
 
 RUN pip3 install boto3
+
+FROM install
+
+COPY ./src .
 
 CMD [ "python3", "backupScript.py"]
