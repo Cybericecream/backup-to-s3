@@ -1,4 +1,5 @@
 import boto3
+import shutil
 from os import walk, environ
 from datetime import datetime
 
@@ -16,12 +17,12 @@ linode_obj_config = {
     "endpoint_url": endpoint_url,
 }
 
-def findFilesToBackup(backupDirectory: str) -> []:
-    files = []
+def findDirectoriesToBackup(backupDirectory: str) -> []:
+    directories = []
     for (dirpath, dirnames, filenames) in walk(backupDirectory):
-        files.extend(filenames)
+        directories.extend(dirnames)
         break
-    return files
+    return directories
 
 def isBucketInS3(target_bucket: str, buckets: []) -> bool:
     bucketFound = False
@@ -38,8 +39,13 @@ def uploadObjectToBucket(target_bucket: str, filename: str, filelocation: str) -
     client.upload_file(
         Filename=filelocation,
         Bucket=target_bucket,
-        Key='{}/{}/{}'.format(filename, datetime.now().strftime("%Y%m%d%H%M%S"), filename)
+        Key=f'{filename}/{datetime.now().strftime("%Y%m%d%H%M%S")}/{filename}'
     )   
+
+def archiveToS3(directories) -> None:
+    for directory in directories:
+        shutil.make_archive(f'/tmp/{directory}', 'zip', root_dir=f'{backupDirectory}/{directory}')
+        uploadObjectToBucket(target_bucket, f'{directory}.zip', f"/tmp/{directory}.zip")
 
 client = boto3.client("s3", **linode_obj_config)
 
@@ -48,7 +54,6 @@ response = client.list_buckets()
 if isBucketInS3(target_bucket, response['Buckets']) == False:
     createNewBucket(client, target_bucket)  
 
-files = findFilesToBackup(backupDirectory)
+directories = findDirectoriesToBackup(backupDirectory)
 
-for file in files:
-    uploadObjectToBucket(target_bucket, file, "{}/{}".format(backupDirectory, file))
+archiveToS3(directories)
