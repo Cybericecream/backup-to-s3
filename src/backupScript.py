@@ -44,7 +44,10 @@ def uploadObjectToBucket(target_bucket: str, filename: str, filelocation: str) -
 
 def archiveToS3(directories) -> None:
     for directory in directories:
+        print(f'Backing up {directory}')
+        print(f'Zipping {directory}')
         shutil.make_archive(f'/tmp/{directory}', 'zip', root_dir=f'{backupDirectory}/{directory}')
+        print(f'Uploading {directory}')
         uploadObjectToBucket(target_bucket, f'{directory}.zip', f"/tmp/{directory}.zip")
 
 client = boto3.client("s3", **linode_obj_config)
