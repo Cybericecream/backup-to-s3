@@ -4,7 +4,7 @@ from directoryManagement import findDirectoriesToBackup
 from s3Management import isBucketInS3, createNewBucket, uploadObjectToBucket, archiveToS3
 
 # Variables
-backupDirectory = "./backupPoint"
+backupDirectory = "/backupPoint"
 
 target_bucket = environ.get('TARGET_BUCKET')
 access_key = environ.get('ACCESS_KEY')
