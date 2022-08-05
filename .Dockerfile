@@ -10,4 +10,4 @@ FROM install
 
 COPY ./src .
 
-CMD [ "python3", "backupScript.py"]
+CMD [ "python3", "main.py"]
